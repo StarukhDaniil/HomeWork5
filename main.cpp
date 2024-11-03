@@ -2,12 +2,14 @@
 #include <fstream>
 #include <string>
 #include <chrono>
+#pragma warning(disable: 4496)
 
 class Logger {
 private:
 	std::string getCurrentTime() const {
 		auto now = std::chrono::system_clock::now();
 		auto time_t_now = std::chrono::system_clock::to_time_t(now);
+		std::tm buffer;
 		return std::format("{:%H:%M:%S}", *std::localtime(&time_t_now));
 	}
 
