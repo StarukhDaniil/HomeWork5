@@ -5,7 +5,6 @@
 #include <ctime>
 #include <sstream>
 #include <vector>
-#include <initializer_list>
 #pragma warning(disable: 4996)
 
 enum class LogLevels {
@@ -75,11 +74,6 @@ private:
 	std::vector<Config> config;
 	ConfigManager() = default;
 public:
-	static ConfigManager& getInstance() {
-		static ConfigManager configManager;
-		return configManager;
-	}
-
 	void setConfig(const std::string key, const std::string value) {
 		config.push_back(Config(key, value));
 	}
@@ -96,10 +90,26 @@ public:
 	ConfigManager(const ConfigManager&) = delete;
 	ConfigManager operator=(const ConfigManager&) = delete;
 	~ConfigManager() = default;
+	static ConfigManager& getInstance() {
+		static ConfigManager configManager;
+		return configManager;
+	}
 };
 
 int main() {
 	Logger::getInstance().log("asd", LogLevels::info);
-	Logger::getInstance().log("asd", LogLevels::warning);
+	Logger::getInstance().log("fgh", LogLevels::warning);
+	ConfigManager::getInstance().setConfig("1", "qwerty");
+	try {
+		std::cout << ConfigManager::getInstance().getConfig("1") << std::endl;
+		std::cout << ConfigManager::getInstance().getConfig("12") << std::endl;
+	}
+	catch (std::runtime_error error) {
+		std::cerr << error.what() << std::endl;
+	}
+	catch (...) {
+		std::cerr << "Unknown error" << std::endl;
+	}
+
 	return 0;
 }
