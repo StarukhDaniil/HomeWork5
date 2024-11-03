@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <chrono>
-#pragma warning(disable: 4496)
+#pragma warning(disable: 4996)
 
 class Logger {
 private:
