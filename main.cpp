@@ -5,6 +5,7 @@
 #include <ctime>
 #include <sstream>
 #include <vector>
+#pragma warning(disable: 4996)
 
 enum class LogLevels {
 	info = 0,
