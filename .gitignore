@@ -1,0 +1,5 @@
+*.bat
+.vs/
+out.
+build/
+log.txt
