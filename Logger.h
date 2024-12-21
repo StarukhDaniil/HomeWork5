@@ -3,6 +3,7 @@
 #include <string>
 #include <chrono>
 #include <fstream>
+#include <mutex>
 
 enum class LogLevels {
 	info = 0,
@@ -22,14 +23,22 @@ private:
 		return oss.str();
 	}
 
+	static Logger* instance;
+	static std::mutex mutex;
+
 	Logger() = default;
 public:
 	static Logger& getInstance() {
-		static Logger logger;
-		return logger;
+		std::lock_guard<std::mutex> lock(mutex);
+		if (instance == nullptr) {
+			instance = new Logger();
+			std::atexit([]() {delete instance; });
+		}
+		return *instance;
 	}
 
 	void log(std::string message, LogLevels logLevel) const {
+		std::lock_guard<std::mutex> lock(mutex);
 		std::ofstream logFile("log.txt", std::ios::app);
 		if (logFile.is_open()) {
 			switch (logLevel) {
@@ -55,3 +64,6 @@ public:
 	Logger operator=(const Logger&) = delete;
 	~Logger() = default;
 };
+
+Logger* Logger::instance = nullptr;
+std::mutex Logger::mutex;
