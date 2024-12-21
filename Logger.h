@@ -1,0 +1,69 @@
+#pragma once
+
+#include <string>
+#include <chrono>
+#include <fstream>
+#include <mutex>
+
+enum class LogLevels {
+	info = 0,
+	warning = 1,
+	error = 2,
+};
+
+class Logger {
+private:
+	std::string getCurrentTime() const {
+		auto now = std::chrono::system_clock::now();
+		auto time_t_now = std::chrono::system_clock::to_time_t(now);
+		std::tm* tm_now = std::localtime(&time_t_now);
+
+		std::ostringstream oss;
+		oss << std::put_time(tm_now, "%H:%M:%S");
+		return oss.str();
+	}
+
+	static Logger* instance;
+	static std::mutex mutex;
+
+	Logger() = default;
+public:
+	static Logger& getInstance() {
+		std::lock_guard<std::mutex> lock(mutex);
+		if (instance == nullptr) {
+			instance = new Logger();
+			std::atexit([]() {delete instance; });
+		}
+		return *instance;
+	}
+
+	void log(std::string message, LogLevels logLevel) const {
+		std::lock_guard<std::mutex> lock(mutex);
+		std::ofstream logFile("log.txt", std::ios::app);
+		if (logFile.is_open()) {
+			switch (logLevel) {
+			case LogLevels::info:
+				logFile << "Info: " << getCurrentTime() << " - " << message << std::endl;
+				break;
+			case LogLevels::warning:
+				logFile << "Warning: " << getCurrentTime() << " - " << message << std::endl;
+				break;
+			case LogLevels::error:
+				logFile << "Error: " << getCurrentTime() << " - " << message << std::endl;
+				break;
+			default:
+				std::cerr << "Wrong LogLevel catched :(" << std::endl;
+			}
+		}
+		else {
+			std::cerr << "File opening is unsuccesful :(" << std::endl;
+		}
+	}
+
+	Logger(const Logger&) = delete;
+	Logger operator=(const Logger&) = delete;
+	~Logger() = default;
+};
+
+Logger* Logger::instance = nullptr;
+std::mutex Logger::mutex;

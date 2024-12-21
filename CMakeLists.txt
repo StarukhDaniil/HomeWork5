@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX EXTENSIONS OFF)
 
-add_executable(hw5 main.cpp)
+add_executable(hw5 main.cpp "Logger.h"  "ConfigManager.h")
